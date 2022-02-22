@@ -1,0 +1,18 @@
+agent:
+  alpha: 0.000025
+  beta: 0.00025
+  tau: 1e-3
+  gamma: 0.99 
+  max_size: 1_000_000
+  batch_size: 64
+  save_path: 'tests/LLC1'
+env:
+  name: 'LunarLanderContinuous-v2'
+memory:
+  warm_start: False
+  n_random_actions: 0
+  prioritized: False
+  alpha: 0.7
+  beta: 0.5
+  random_state: 
+
