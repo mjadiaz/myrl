@@ -7,12 +7,13 @@ class ModelIO:
     def __init__(self,  save_path, name):
         self._save_path = save_path
         self._name = name
-        self._model_file = os.path.join(self._save_path, self._name)
     def save_model(self, state_dict):
+        self._model_file = os.path.join(self._save_path, self._name)
         if not(os.path.exists(self._save_path)):
             os.makedirs(self._save_path)
         torch.save(state_dict, self._model_file)
     def load_model(self, model):
+        self._model_file = os.path.join(self._save_path, self._name)
         model.load_state_dict(torch.load(self._model_file))
         
 def experiences_to_numpy(experiences):

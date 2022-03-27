@@ -1,15 +1,15 @@
 agent:
-  alpha: 0.000025
+  alpha: 0.00025
   beta: 0.00025
   tau: 1e-3
   gamma: 0.99 
-  max_size: 1_000_000
+  max_size: 100_000
   batch_size: 64
-  save_path: 'tests/LLC1'
+  save_path: 'runs/pheno1'
 env:
-  name: 'LunarLanderContinuous-v2'
-  config: 
+  name: 'PhenoEnvContinuous-v0'
 memory:
+  save_checkpoints: True
   warm_start: False
   n_random_actions: 0
   prioritized: False

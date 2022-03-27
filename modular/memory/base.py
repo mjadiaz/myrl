@@ -11,15 +11,25 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Tuple
 from omegaconf import DictConfig
+from collections import namedtuple
 
-@dataclass(frozen=True)
-class Experience:
-    state: np.ndarray
-    action: np.ndarray
-    reward: any 
-    new_state: np.ndarray
-    done: bool
-
+#@dataclass(frozen=True)
+#class Experience:
+#    state: np.ndarray
+#    action: np.ndarray
+#    reward: any 
+#    new_state: np.ndarray
+#    done: bool
+Experience = namedtuple(
+    'Experience',
+    field_names=[
+        'state',
+        'action',
+        'reward',
+        'new_state',
+        'done'
+        ]
+    )
 
 class ReplayMemoryBase(ABC):
     '''

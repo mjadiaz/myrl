@@ -29,10 +29,10 @@ class DequeReplay(ReplayMemoryBase):
         return len(self.memory)
 
     def add(self, experience: Experience):
-        exp = namedtuple('Experience', 
-                field_names=[   'state', 'action', 'reward',
-                                'new_state', 'done'])
-        _exp = exp(experience.state, experience.action, experience.reward, experience.new_state, experience.done)
+        #exp = namedtuple('Experience', 
+        #        field_names=[   'state', 'action', 'reward',
+        #                        'new_state', 'done'])
+        _exp = Experience(experience.state, experience.action, experience.reward, experience.new_state, experience.done)
         self.memory.append(_exp)
     def sample(self):
         indices = np.random.choice(self.__len__(), self._batch_size, replace=False)

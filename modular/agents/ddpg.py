@@ -6,14 +6,16 @@ from modular.memory.memory import PrioritizedReplayMemory, Experience, DequeRepl
 from modular.common.utils import experiences_to_tensor
 import torch
 import torch.nn.functional as F
-
+import pickle
+import os
 import gym
 class HyperParamsDDPG:
-    def __init__(self, agent_file: str):
+    def __init__(self, agent_file: str, env_config: DictConfig = None):
         self._hp = OmegaConf.load(agent_file)
         self.alpha = self._hp.agent.alpha
         self.beta = self._hp.agent.beta
         self.gamma = self._hp.agent.gamma
+        self._env_config = env_config
         self.create_env() 
         self.create_network('actor', self.alpha )
         self.create_network('target_actor', self.alpha )
@@ -27,7 +29,10 @@ class HyperParamsDDPG:
     def get_config(self):
         return self._hp
     def create_env(self):
-        env = gym.make(self._hp.env.name)
+        if not(self._env_config == None):
+            env = gym.make(self._hp.env.name, env_config= self._env_config)
+        else:
+            env = gym.make(self._hp.env.name)
         config = OmegaConf.create(
                 {'env': {
                     'state_dimension': env.observation_space.shape[0],
@@ -235,13 +240,28 @@ class DDPG:
         self.actor.optimizer.step()
 
         self.update_target_networks()
-    
+
+    def update_save_path(self, new_path):
+        self._save_path = new_path
+        self.actor._model_io._save_path = new_path
+        self.critic._model_io._save_path = new_path
+        self.target_actor._model_io._save_path = new_path
+        self.target_critic._model_io._save_path = new_path
+
     def save_models(self):
         self.actor.save_model()
         self.critic.save_model()
         self.target_actor.save_model()
         self.target_critic.save_model()
-
+        if self._hp.memory.save_checkpoints:
+            memory_path = os.path.join(
+                self._save_path,
+                'memory.pickle'
+                )
+            with open(memory_path, 'wb') as f:
+                memory = self.memory.memory
+                pickle.dump(memory, f)
+    
     def load_models(self):
         self.actor.load_model()
         self.critic.load_model()
