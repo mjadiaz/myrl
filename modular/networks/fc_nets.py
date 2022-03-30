@@ -60,7 +60,10 @@ class DDPGActor(nn.Module, NeuralNetBase):
     @property
     def device(self):
         return self._device
-    
+    @device.setter
+    def device(self, value):
+        self._device =  value
+
     def forward(self, state):
         a = self._linear_block(state)
         return a

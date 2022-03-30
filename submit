@@ -14,5 +14,5 @@ source activate rrlib
 python --version
 which python
 #python BLSSM.py
-python train_ddpg.py
+python test_d3pg.py
 #python BLSSM_mg5.py

@@ -1,0 +1,22 @@
+agent:
+  alpha: 0.00025
+  beta: 0.00025
+  tau: 1e-3
+  gamma: 0.99 
+  max_size: 1000000
+  batch_size: 3
+  save_path: 'runs/pheno1'
+  max_steps: 1000000
+  actor_buffer_size: 1000
+  update_params_interval: 5 #50
+env:
+  name: 'PhenoEnvContinuous-v0'
+memory:
+  save_checkpoints: True
+  warm_start: False
+  n_random_actions: 0
+  prioritized: False
+  alpha: 0.7
+  beta: 0.5
+  random_state: 
+
