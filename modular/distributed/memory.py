@@ -18,7 +18,7 @@ class GlobalMemory:
     def add(self, experience):
         self.memory.add(experience)
         self.increment_step()
-        print(f'step_counter: {self.step_counter}')
+        #print(f'step_counter: {self.step_counter}')
     def get_memory(self):
         return self.memory.memory
     

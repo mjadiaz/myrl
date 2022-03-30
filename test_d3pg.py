@@ -12,7 +12,8 @@ from omegaconf import OmegaConf
 from modular.memory.memory import DequeReplay, Experience
 from ray.tune.registry import register_env
 
-env_config = OmegaConf.load('hep_tools.yaml')
+#env_config = OmegaConf.load('hep_tools.yaml')
+env_config = None
 hyper_params = HyperParamsActor('d3pg.yaml', env_config=env_config).get_config()
 ray.init(local_mode=False)
 

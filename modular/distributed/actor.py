@@ -87,6 +87,7 @@ class Actor:
         self.state_dimension = self.hp.env.state_dimension
         self.action_dimension = self.hp.env.action_dimension
         self.actor_buffer_size = self.hp.agent.actor_buffer_size
+        self.max_steps = self.hp.agent.max_steps
         # Internal Experience replay for memory efficiency
         #self.actor_max_size = self.hp.agent.actor_max_size
 
@@ -121,10 +122,10 @@ class Actor:
         
 
     def pull_parameters(self):
-        print('actor: pulling parameters from parameter server')
+        #print('actor: pulling parameters from parameter server')
         weights = ray.get(self.parameter_server.get_weights.remote())
         self.actor.load_state_dict(weights)
-        print('actor: weights updated from parameter server')
+        #print('actor: weights updated from parameter server')
 
     def push_experience(self, experience):
         #print('actor: pushing experience')
@@ -152,18 +153,22 @@ class Actor:
         self.push_experience(experience)
 
     def enough_experience(self):
-        if ray.get(self.global_memory.is_full.remote()):
-            print('actor: is full')
-            return True
-        else:
+        if ray.get(self.global_memory.get_step_counter.remote()) < self.max_steps:
             return False
+        else:
+            return True
+        #if ray.get(self.global_memory.is_full.remote()):
+        #    print('actor: is full')
+        #    return True
+        #else:
+        #    return False
         #if self.memory.__len__() >= self.actor_buffer_size:
         #    return True
         #else:
         #    return False
     def track_updates(self):
         updates = ray.get(self.parameter_server.get_updates_counter.remote())
-        print('updates:', updates)
+        #print('updates:', updates)
         if self.updates_number_tracker != updates:
             self.pull_parameters()
         self.updates_number_tracker = updates

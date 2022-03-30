@@ -17,7 +17,7 @@ class ParameterServer:
         
     def increment_updates_counter(self):
         self.updates_counter += 1
-        print(f'param_server: we have {self.updates_counter} update so far mate')
+        #print(f'param_server: we have {self.updates_counter} update so far mate')
     
     def get_updates_counter(self):
         return self.updates_counter
@@ -29,7 +29,7 @@ class ParameterServer:
     def update_weights(self, weights):
         self.actor.load_state_dict(weights)
         self.increment_updates_counter()
-        print('weights updated')
+        #print('weights updated')
 
 
 

@@ -4,13 +4,13 @@ agent:
   tau: 1e-3
   gamma: 0.99 
   max_size: 1000000
-  batch_size: 3
+  batch_size: 128
   save_path: 'runs/pheno1'
   max_steps: 1000000
   actor_buffer_size: 1000
-  update_params_interval: 5 #50
+  update_params_interval: 50
 env:
-  name: 'PhenoEnvContinuous-v0'
+  name: 'MountainCarContinuous-v0' #'PhenoEnvContinuous-v0'
 memory:
   save_checkpoints: True
   warm_start: False
