@@ -77,7 +77,8 @@ class Actor:
             actor_id,
             parameter_server,
             global_memory,
-            hyper_params: DictConfig
+            hyper_params: DictConfig,
+            summary_writer,
         ):
         self.hp = hyper_params
         self.alpha = self.hp.agent.alpha
@@ -90,6 +91,9 @@ class Actor:
         self.max_steps = self.hp.agent.max_steps
         # Internal Experience replay for memory efficiency
         #self.actor_max_size = self.hp.agent.actor_max_size
+
+        # Summary writer
+        self.summary_writer = summary_writer
 
         # Global Experience Replay Memory
         self.global_memory = global_memory
@@ -125,7 +129,7 @@ class Actor:
         #print('actor: pulling parameters from parameter server')
         weights = ray.get(self.parameter_server.get_weights.remote())
         self.actor.load_state_dict(weights)
-        #print('actor: weights updated from parameter server')
+        print('actor: weights updated from parameter server')
 
     def push_experience(self, experience):
         #print('actor: pushing experience')
@@ -171,7 +175,7 @@ class Actor:
         #print('updates:', updates)
         if self.updates_number_tracker != updates:
             self.pull_parameters()
-        self.updates_number_tracker = updates
+            self.updates_number_tracker = updates
 
     def run(self):
         while not self.enough_experience():
@@ -180,16 +184,30 @@ class Actor:
             #print('actor:', state)
             done = False
             episode_reward = 0
-            
+            self.pull_parameters()
+            episode_length = 0
             while not done:
                 action = self.select_action(state)
                 new_state, reward, done, info = self.env.step(action)
                 self.remember(state, action, reward, new_state, done)
                 state = new_state
                 episode_reward += reward
-                self.track_updates()
+                episode_length += 1
                 #print('reward:', reward)
             #self.env.close()
-            print(f'episode reward: {episode_reward}')
+            episode_number = ray.get(
+                self.global_memory.increment_episodes_counter.remote()
+                )
+            self.summary_writer.add_scalar.remote(
+                'Episode_total_reward/Episodes',
+                episode_reward,
+                episode_number
+                )
+            self.summary_writer.add_scalar.remote(
+                'Episode_length/Episodes',
+                episode_length,
+                episode_number
+                )
+            #print(f'episode reward: {episode_reward}')
 
 

@@ -13,6 +13,7 @@ class GlobalMemory:
         self.max_size = self.hp.max_size
         self.memory = DequeReplay(self.hp)
         self.step_counter = 0
+        self.episodes_counter = 0 
         self.batch_size = self.hp.batch_size
         
     def add(self, experience):
@@ -24,6 +25,13 @@ class GlobalMemory:
     
     def increment_step(self):
         self.step_counter += 1
+
+    def increment_episodes_counter(self):
+        self.episodes_counter += 1
+        return self.episodes_counter
+
+    def get_episodes_counter(self):
+        return self.episodes_counter
 
     def get_step_counter(self):
         return self.step_counter

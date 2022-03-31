@@ -6,16 +6,21 @@ from modular.distributed.actor import HyperParamsActor, Actor
 from modular.distributed.memory import GlobalMemory
 from modular.distributed.parameter_server import ParameterServer
 from modular.distributed.learner import Learner
+from modular.distributed.utils import Writer
 
 from omegaconf import OmegaConf
 #from pheno_game.envs.pheno_env import PhenoEnvContinuous_v0
 from modular.memory.memory import DequeReplay, Experience
 from ray.tune.registry import register_env
+from torch.utils.tensorboard import SummaryWriter
+
 
 #env_config = OmegaConf.load('hep_tools.yaml')
 env_config = None
 hyper_params = HyperParamsActor('d3pg.yaml', env_config=env_config).get_config()
 ray.init(local_mode=False)
+# Writer init
+writer = Writer.remote(hyper_params.agent.save_path)
 
 #GlobalMemory = ray.remote(DequeReplay)
 global_memory = GlobalMemory.remote(hyper_params.memory)
@@ -23,8 +28,8 @@ global_memory = GlobalMemory.remote(hyper_params.memory)
 parameter_server = ParameterServer.remote(hyper_params)
 print(ray.get(global_memory.get_memory.remote()))
 #print(ray.get(parameter_server.get_updates_counter.remote()))
-actors  = [Actor.remote(i, parameter_server, global_memory, hyper_params) for i in range(3)]
-learner = Learner.remote(parameter_server, global_memory, hyper_params)
+actors  = [Actor.remote(i, parameter_server, global_memory, hyper_params, writer) for i in range(7)]
+learner = Learner.remote(parameter_server, global_memory, hyper_params, writer)
 # Run all the processes
 processes = []
 for actor in actors:

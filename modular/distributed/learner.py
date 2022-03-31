@@ -19,12 +19,14 @@ class Learner:
         self,
         parameter_server,
         global_memory,
-        hyper_params
+        hyper_params,
+        summary_writer
         ):
         
         self.hp = hyper_params
         self.parameter_server = parameter_server
         self.global_memory = global_memory
+        self.summary_writer = summary_writer
         
         # Learner parameters
         self.alpha = self.hp.agent.alpha
@@ -37,12 +39,17 @@ class Learner:
         self.save_path = self.hp.agent.save_path
         self.batch_size = self.hp.agent.batch_size
         self.update_params_interval = self.hp.agent.update_params_interval
+        
+
+        # Saving checkpoints
+
+        self.save_checkpoints = self.hp.memory.save_checkpoints
+        self.checkpoints_interval = self.hp.agent.checkpoints_interval
 
         # Learning steps counter
         self.learning_steps = 0
 
         # Create networks
-        # Do I need actor? I don't think so
         self.actor = DDPGActor(self.hp.actor)
         self.target_actor =  DDPGActor(self.hp.target_actor)
         self.critic = DDPGCritic(self.hp.critic)
@@ -112,8 +119,11 @@ class Learner:
         self.actor.optimizer.step()
 
         self.update_target_networks()
+        #self.parameter_server.increment_learning_steps_counter.remote()
         self.learning_steps += 1
         #print('learning steps, ',self.learning_steps)
+        self.summary_writer.add_scalar.remote('Critic loss', critic_loss, self.learning_steps)
+        self.summary_writer.add_scalar.remote('Actor loss', actor_loss, self.learning_steps)
     
     def get_learning_steps(self):
         return self.learning_steps
@@ -129,10 +139,10 @@ class Learner:
         self.target_critic._model_io._save_path = new_path
 
     def save_models(self):
-        self.actor.save_models()
-        self.critic.save_models()
-        self.target_actor.save_models()
-        self.target_critic.save_models()
+        self.actor.save_model()
+        self.critic.save_model()
+        self.target_actor.save_model()
+        self.target_critic.save_model()
         if self.hp.memory.save_checkpoints:
             memory_path = os.path.join(
                 self.save_path,
@@ -156,9 +166,14 @@ class Learner:
         while ray.get(self.global_memory.get_step_counter.remote()) < self.max_steps:
             #print(f'learner: empece que wea, paso {self.get_learning_steps()}')
             self.learn()
-            
-            if (self.learning_steps % self.update_params_interval == 0) and (self.learning_steps > 0):
+            first_batch = self.learning_steps > 0 
+
+            if (self.learning_steps % self.update_params_interval == 0) and first_batch:
                 self.push_actor_parameters()
+
+            if (self.learning_steps % self.checkpoints_interval == 0) and first_batch :
+                self.save_models()
+#          
 
 
 

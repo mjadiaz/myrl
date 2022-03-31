@@ -14,16 +14,24 @@ class ParameterServer:
 
         # Updates counter
         self.updates_counter = 0
+
+        # Learning steps counter
+        self.learning_steps = 0
         
     def increment_updates_counter(self):
         self.updates_counter += 1
         #print(f'param_server: we have {self.updates_counter} update so far mate')
+    def increment_learning_steps_counter(self):
+        self.learning_steps += 1
+    def get_learning_steps_counter(self):
+        return self.learning_steps
     
     def get_updates_counter(self):
         return self.updates_counter
 
     def get_weights(self):
-        weights = dict(self.actor.named_parameters())
+        #weights = dict(self.actor.named_parameters())
+        weights = self.actor.state_dict()
         return weights
 
     def update_weights(self, weights):
