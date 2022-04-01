@@ -11,7 +11,7 @@ agent:
   update_params_interval: 100 #  Learning steps
   checkpoints_interval: 1000 # Learning steps.
 env:
-  name: 'LunarLanderContinuous-v2' #'MountainCarContinuous-v0' #'PhenoEnvContinuous-v0'
+  name:   'LunarLanderContinuous-v2' #'MountainCarContinuous-v0' #'PhenoEnvContinuous-v0'
 memory:
   save_checkpoints: True
   warm_start: False

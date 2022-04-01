@@ -209,5 +209,94 @@ class Actor:
                 episode_number
                 )
             #print(f'episode reward: {episode_reward}')
+@ray.remote
+class ActorEval:
+    def __init__(
+            self,
+            hyper_params: DictConfig,
+            n_episodes,
+            render,
+            noise_eval=False,
+        ):
+        self.hp = hyper_params
+        self.alpha = self.hp.agent.alpha
+        #self.beta = self.hp.agent.beta
+        #self.tau = self.hp.agent.tau
+        self.gamma = self.hp.agent.gamma
+        self.state_dimension = self.hp.env.state_dimension
+        self.action_dimension = self.hp.env.action_dimension
+        self.actor_buffer_size = self.hp.agent.actor_buffer_size
+        self.max_steps = self.hp.agent.max_steps
+        self.save_path = self.hp.agent.save_path
+        self.noise_eval = noise_eval
+        self.n_episodes = n_episodes
+        self.render = render
+
+        # Internal Experience replay for memory efficiency
+        #self.actor_max_size = self.hp.agent.actor_max_size
 
 
+        # Create Actor network in eval mode
+        self.actor = DDPGActor(self.hp.actor)
+        self.actor.load_model()
+        self.actor.device = 'cpu'
+        self.actor.eval()
+
+        # Initialize noise
+        self.noise = OUActionNoise(mu = np.zeros(self.action_dimension))
+
+        self.device = self.actor.device
+
+
+        #Create Environment
+        if not(self.hp.env_config == None):
+            #self.env = gym.make(self.hp.env.name, env_config = self.hp.env_config)
+            self.env = PhenoEnvContinuous_v0(env_config=self.hp.env_config)
+            
+        else:
+            self.env = gym.make(self.hp.env.name)
+        
+
+    def select_action(self, state: np.ndarray):
+        '''
+            Forwards the state though the actor network
+        to get an action prediction.
+        - The action is clipped 
+        '''
+        state = torch.tensor(state).float().to(self.device)
+        if self.noise_eval:
+            action = self.actor(state) +\
+            torch.tensor(self.noise()).float().to(self.device)
+        else:
+            action = self.actor(state)
+
+        action = np.clip(
+            action.cpu().detach().numpy(),
+            self.hp.env.action_min,
+            self.hp.env.action_max
+        )
+        return action
+
+    def load_model(self):
+        self.actor.load_model()
+
+    def run(self):
+        for i in range(self.n_episodes):
+            if self.noise_eval:
+                self.noise.reset()
+            state = self.env.reset()
+            #print('actor:', state)
+            done = False
+            episode_reward = 0
+            episode_length = 0
+            while not done:
+                action = self.select_action(state)
+                new_state, reward, done, info = self.env.step(action)
+                #self.remember(state, action, reward, new_state, done)
+                state = new_state
+                episode_reward += reward
+                episode_length += 1
+                if self.render:
+                    self.env.render()
+                #print('reward:', reward)
+            print(f'Episode {i}, Total_reward: {episode_reward}, Length: {episode_length}')
