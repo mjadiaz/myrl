@@ -28,7 +28,7 @@ def main():
     parameter_server = ParameterServer.remote(hyper_params)
     print(ray.get(global_memory.get_memory.remote()))
     #print(ray.get(parameter_server.get_updates_counter.remote()))
-    actors  = [Actor.remote(i, parameter_server, global_memory, hyper_params, writer) for i in range(7)]
+    actors  = [Actor.remote(i, parameter_server, global_memory, hyper_params, writer) for i in range(15)]
     learner = Learner.remote(parameter_server, global_memory, hyper_params, writer)
     # Run all the processes
     processes = []
