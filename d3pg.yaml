@@ -13,7 +13,7 @@ agent:
 env:
   name:   'LunarLanderContinuous-v2' #'MountainCarContinuous-v0' #'PhenoEnvContinuous-v0'
 memory:
-  save_checkpoints: True
+  save_checkpoints: False
   warm_start: False
   n_random_actions: 0
   prioritized: False

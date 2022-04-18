@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=Agent
-#SBATCH --ntasks-per-node=12
-#SBATCH --time=1:00:00
+#SBATCH --ntasks-per-node=20
+#SBATCH --time=2:00:00
 
 source /home/mjad1g20/.bashrc
 #module load conda/py3-latest
