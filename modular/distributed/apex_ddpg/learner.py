@@ -129,11 +129,9 @@ class Learner:
 
             y = rewards + gammas * target_values*\
                     (torch.ones(self.batch_size).to(self.device) - dones)
-            print(obs.shape, obs)
-            print(actions.shape, actions)
-            values = self.critic(obs, actions.reshape((actions.shape[0],1))).flatten()
+            values = self.critic(obs, actions).flatten()
 
-            self.critc.train()
+            self.critic.train()
             self.critic.optimizer.zero_grad()
 
             critic_loss = F.mse_loss(y, values)
