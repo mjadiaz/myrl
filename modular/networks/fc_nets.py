@@ -73,6 +73,12 @@ class DDPGActor(nn.Module, NeuralNetBase):
 
     def load_model(self):
         self._model_io.load_model(self)
+    def get_weights(self):
+        return {k: v.cpu() for k, v in self.state_dict().items()}
+
+    def set_weights(self, weights):
+        self.load_state_dict(weights)
+
 
 class DDPGCritic(nn.Module, NeuralNetBase):
     '''
@@ -140,6 +146,12 @@ class DDPGCritic(nn.Module, NeuralNetBase):
     def load_model(self):
         self._model_io.load_model(self)
         
+    def get_weights(self):
+        return {k: v.cpu() for k, v in self.state_dict().items()}
+
+    def set_weights(self, weights):
+        self.load_state_dict(weights)
+
 
 class DQNfc(nn.Module, NeuralNetBase):
     '''
@@ -158,9 +170,9 @@ class DQNfc(nn.Module, NeuralNetBase):
         self._model_io = ModelIO(self._save_path, self._name)
 
         self.linear_block = nn.Sequential(
-                nn.Linear(self._state_dimension, 128),
-                nn.ReLU(),
-                nn.Linear(128, self._action_dimension) 
+                nn.Linear(self._state_dimension, 256),
+                nn.Tanh(),
+                nn.Linear(256, self._action_dimension) 
                 )
         self.optimizer = optim.Adam(self.parameters(), lr=self._learning_rate) 
         self.to(self.device)
@@ -181,3 +193,11 @@ class DQNfc(nn.Module, NeuralNetBase):
 
     def load_model(self):
         self._model_io.load_model(self)
+    
+    def get_weights(self):
+        return {k: v.cpu() for k, v in self.state_dict().items()}
+
+    def set_weights(self, weights):
+        self.load_state_dict(weights)
+
+

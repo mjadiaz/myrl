@@ -28,7 +28,7 @@ def main():
     parameter_server = ParameterServer.remote(hyper_params)
     print(ray.get(global_memory.get_memory.remote()))
     #print(ray.get(parameter_server.get_updates_counter.remote()))
-    actors  = [Actor.remote(i, parameter_server, global_memory, hyper_params, writer) for i in range(7)]
+    actors  = [Actor.remote(i, parameter_server, global_memory, hyper_params, writer) for i in range(4)]
     learner = Learner.remote(parameter_server, global_memory, hyper_params, writer)
     # Run all the processes
     processes = []
@@ -44,16 +44,16 @@ def main():
     # print summary
     ray.timeline()
 
-def test():
+def test(render=False):
     #env_config = OmegaConf.load('hep_tools.yaml')
     env_config = None
     hyper_params = HyperParamsActor('d3pg.yaml', env_config=env_config).get_config()
     ray.init(local_mode=True)
 
-    actor  = ActorEval.remote(hyper_params, n_episodes=10, render=False)
+    actor  = ActorEval.remote(hyper_params, n_episodes=10, render=render)
     actor.run.remote()
 
 
 
 if __name__ == "__main__":
-    test()
+    test(True)

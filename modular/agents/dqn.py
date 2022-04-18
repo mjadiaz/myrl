@@ -72,6 +72,7 @@ class DQN:
         self._max_size = self._hp.agent.max_size
         self._batch_size = self._hp.agent.batch_size
         self._save_path = self._hp.agent.save_path
+        self.double_dqn = self._hp.agent.double_dqn
         
         # Create Networks
         self.dqn = DQNfc(self._hp.dqn)
@@ -178,16 +179,30 @@ class DQN:
         
         self.target_dqn.eval()
         self.dqn.eval()
+        if self.double_dqn:
+            q_values = self.dqn(states)
+            max_q_values = torch.gather(
+                    q_values, 1, actions.unsqueeze(-1).to(torch.int64)) 
+            max_q_values = max_q_values.flatten()
+            astar = torch.argmax(q_values, dim=1)
+            qs = self.target_dqn(new_states).gather(
+                    dim=1, index=astar.unsqueeze(dim=1)).squeeze()
+            
+            y = rewards + self._gamma * qs.detach() *\
+                    (torch.ones(self._batch_size).to(self.device) - dones)
+        else:
 
-        target_q_values = self.target_dqn(new_states)
-        target_q_max, target_actions = torch.max(target_q_values, dim=1)
-        
-        q_values = self.dqn(states)
-        max_q_values = torch.gather(q_values, 1, actions.unsqueeze(-1).to(torch.int64)) 
-        max_q_values = max_q_values.flatten()
-        #max_q_values, _ = torch.max(q_values,dim=1)
-        
-        y = rewards + self._gamma * target_q_max * (torch.ones(self._batch_size).to(self.device) - dones)
+            target_q_values = self.target_dqn(new_states)
+            target_q_max, target_actions = torch.max(target_q_values, dim=1)
+            
+            q_values = self.dqn(states)
+            max_q_values = torch.gather(
+                    q_values, 1, actions.unsqueeze(-1).to(torch.int64)) 
+            max_q_values = max_q_values.flatten()
+            #max_q_values, _ = torch.max(q_values,dim=1)
+            
+            y = rewards + self._gamma * target_q_max *\
+                    (torch.ones(self._batch_size).to(self.device) - dones)
         
         self.dqn.train()
         self.dqn.optimizer.zero_grad()
@@ -196,7 +211,7 @@ class DQN:
         dqn_loss.backward()
         self.dqn.optimizer.step()
 
-        if (self._frame % 1000 == 0):
+        if (self._frame % 100 == 0):
             self.update_target_networks()
 
 

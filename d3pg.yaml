@@ -5,10 +5,10 @@ agent:
   gamma: 0.99 
   max_size: 1_000_000
   batch_size: 128
-  save_path: 'runs/test_4'
+  save_path: 'runs/test_5'
   max_steps: 5_000_000 # Environment steps
   actor_buffer_size: 1000
-  update_params_interval: 100 #  Learning steps
+  update_params_interval: 50 #  Learning steps
   checkpoints_interval: 1000 # Learning steps.
 env:
   name:   'LunarLanderContinuous-v2' #'MountainCarContinuous-v0' #'PhenoEnvContinuous-v0'

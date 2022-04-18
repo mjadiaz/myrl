@@ -23,3 +23,12 @@ class OUActionNoise:
     def __repr__(self):
         return 'OrnsteinUhlenbeckActionNoise(mu={}, sigma={})'.format(
                                                             self.mu, self.sigma)
+
+class GaussNoise:
+    def __init__(self, scale, size):
+        self.scale = scale 
+        self.size = size 
+
+    def __call__(self):
+        x = np.random.normal(0, scale=self.scale, size=self.size)
+        return x

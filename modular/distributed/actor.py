@@ -8,7 +8,7 @@ from modular.networks.fc_nets import DDPGActor, DDPGCritic
 from modular.exploration.noises import OUActionNoise
 from modular.common.utils import experiences_to_tensor
 from modular.memory.memory import DequeReplay, Experience
-from pheno_game.envs.pheno_env import PhenoEnvContinuous_v0
+#from pheno_game.envs.pheno_env import PhenoEnvContinuous_v0
 
 import ray
 
@@ -33,11 +33,7 @@ class HyperParamsActor:
     def get_config(self):
         return self.hp
     def create_env(self):
-        if not(self.env_config == None):
-            #env = gym.make(self.hp.env.name, env_config = self.env_config)
-            env = PhenoEnvContinuous_v0(env_config=self.env_config)
-        else:
-            env = gym.make(self.hp.env.name)
+        env = gym.make(self.hp.env.name)
         config = OmegaConf.create(
             {"env": {
                 'state_dimension': env.observation_space.shape[0],
@@ -117,12 +113,7 @@ class Actor:
         self.memory = DequeReplay(self.hp.memory)
 
         #Create Environment
-        if not(self.hp.env_config == None):
-            #self.env = gym.make(self.hp.env.name, env_config = self.hp.env_config)
-            self.env = PhenoEnvContinuous_v0(env_config=self.hp.env_config)
-            
-        else:
-            self.env = gym.make(self.hp.env.name)
+        self.env = gym.make(self.hp.env.name)
         
 
     def pull_parameters(self):
