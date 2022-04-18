@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --job-name=Agent
 #SBATCH --ntasks-per-node=8
-#SBATCH --time=6:00:00
+#SBATCH --time=12:00:00
 
 source /home/mjad1g20/.bashrc
 #module load conda/py3-latest

@@ -19,7 +19,7 @@ hyper_params = HyperParamsDDPG('ddpg.yaml', env_config=env_config).get_config()
 agent = DDPG(hyper_params)
 env = gym.make(hyper_params.env.name, env_config=env_config)
 
-MAX_EPISODES = 200
+MAX_EPISODES = 1000 
 total_reward = np.zeros(MAX_EPISODES)
 episode_length = np.zeros(MAX_EPISODES)
 
