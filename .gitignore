@@ -1,3 +1,8 @@
 __pycache__/
 runs/
+<<<<<<< HEAD
 slurm*
+=======
+.DS_Store
+
+>>>>>>> 5eabc1bf265cc41c9dec27857c42f1928cbc8501
