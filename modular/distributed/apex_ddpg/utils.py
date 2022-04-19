@@ -13,8 +13,10 @@ class Writer:
 
 
 class HyperParams:
-    def __init__(self, agent_file: str):
+    def __init__(self, agent_file: str, save_path=None):
         self._hp = OmegaConf.load(agent_file)
+        if not save_path == None:
+            self._hp.agent.save_path = save_path
         self.alpha = self._hp.agent.alpha
         self.beta = self._hp.agent.beta
         self.gamma = self._hp.agent.gamma
