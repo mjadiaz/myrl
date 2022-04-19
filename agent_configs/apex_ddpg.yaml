@@ -9,10 +9,6 @@ agent:
   max_size: 1_000_000
   batch_size: 64
   save_path: 'tests/apex_ddpg_6'
-<<<<<<< HEAD
-  double_dqn: True
-=======
->>>>>>> ca1d381c0badfcdc07d162154fc1f5900d13ddc2
   multi_step_n: 3
   q_update_freq: 100
   send_experience_freq: 100
