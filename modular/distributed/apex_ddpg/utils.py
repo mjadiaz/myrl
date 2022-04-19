@@ -3,6 +3,8 @@ import ray
 from omegaconf import OmegaConf, DictConfig
 import gym
 
+from pheno_game.envs.pheno_env import PhenoEnvContinuous_v0
+
 class Writer:
     def __init__(self, run_name):
         self.run_name = run_name
@@ -26,7 +28,6 @@ class HyperParams:
         self.beta = self._hp.agent.beta
         self.gamma = self._hp.agent.gamma
         self.create_env() 
-        self.create_network('actor_server', self.alpha )
         self.create_network('actor', self.alpha )
         self.create_network('target_actor', self.alpha )
         self.create_network('critic', self.beta )
@@ -40,7 +41,7 @@ class HyperParams:
         return self._hp
     def create_env(self):
         if not(self.env_config == None):
-            env = gym.make(self._hp.name, env_config=self.env_config)
+            env = PhenoEnvContinuous_v0( env_config=self.env_config)
         else:
             env = gym.make(self._hp.env.name)
         config = OmegaConf.create(

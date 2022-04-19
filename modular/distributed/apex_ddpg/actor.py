@@ -4,6 +4,7 @@ import gym
 import numpy as np
 import torch
 
+from pheno_game.envs.pheno_env import PhenoEnvContinuous_v0
 
 from modular.networks.fc_nets import DDPGActor
 from modular.exploration.noises import OUActionNoise, GaussNoise
@@ -15,7 +16,8 @@ class Actor:
             parameter_server,
             config,
             eps,
-            eval=False):
+            eval=False,
+            env_config=None):
         
         self.actor_id = actor_id
         self.replay_buffer = replay_buffer
@@ -27,7 +29,11 @@ class Actor:
         self.actor= DDPGActor(self.hp.actor)
 
         self.device = self.actor.device
-        self.env = gym.make(self.hp.env.name)
+        if env_config:
+            self.env = PhenoEnvContinuous_v0(env_config=env_config)
+        else:
+            self.env = gym.make(self.hp.env.name)
+
         self.local_buffer = []
         self.state_dimension = self.hp.env.state_dimension
         self.action_dimension = self.hp.env.action_dimension
@@ -139,7 +145,7 @@ class Actor:
             if self.current_steps % \
                     self.q_update_freq == 0 and not self.eval:
                         self.update_actor_network()
-        return episode_reward
+        return episode_reward, episode_length
 
     def send_experience_to_replay(self):
         rf = self.replay_buffer.add.remote(self.local_buffer)

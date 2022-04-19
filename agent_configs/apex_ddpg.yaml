@@ -12,12 +12,12 @@ agent:
   multi_step_n: 3
   q_update_freq: 100
   send_experience_freq: 100
-  learning_starts: 5000
-  num_workers: 4
+  learning_starts: 500
+  num_workers: 37
   noise_type: "gauss"
-  timesteps_per_iteration: 10000
+  timesteps_per_iteration: 1000
   max_samples: 5_000_000
 
 env:
-  name: 'LunarLanderContinuous-v2'
+  name: 'PhenoEnvContinuous-v0'
 

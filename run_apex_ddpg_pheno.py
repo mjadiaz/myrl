@@ -24,7 +24,7 @@ def train(save_path):
     hyper_parameters = HyperParams(
         "agent_configs/apex_ddpg.yaml",
         env_config=env_config,
-        save_path,
+        save_path=save_path,
         ).get_config()
     print(hyper_parameters.agent.save_path)
     # Ray actors init
@@ -55,7 +55,8 @@ def train(save_path):
                 replay_buffer,
                 parameter_server,
                 hyper_parameters,
-                eps
+                eps,
+                env_config=env_config
                 )
         actor.sample.remote()
         training_actors_ids.append(actor)
@@ -67,7 +68,8 @@ def train(save_path):
                 parameter_server,
                 hyper_parameters,
                 eps,
-                True
+                True,
+                env_config=env_config
                 )
         eval_actors_ids.append(actor)
 
@@ -78,6 +80,7 @@ def train(save_path):
     total_samples = 0
     best_eval_mean_reward = np.NINF
     eval_mean_rewards = []
+    eval_mean_lens = []
     
     while total_samples < hyper_parameters.agent.max_samples:
         tsid = replay_buffer.get_total_env_samples.remote()
@@ -91,14 +94,26 @@ def train(save_path):
             for eval_actor in eval_actors_ids:
                 sid = eval_actor.sample.remote()
                 eval_sampling_ids.append(sid)
-            eval_rewards = ray.get(eval_sampling_ids)
+            eval_rewards_lens = ray.get(eval_sampling_ids)
+            eval_rewards_lens = np.array(eval_rewards_lens)
+            eval_rewards = eval_rewards_lens[:,0]
+            eval_lens = eval_rewards_lens[:,1]
             print("Evaluation rewards: {}".format(eval_rewards))
+            print("Evaluation lens: {}".formta(eval_lens))
             eval_mean_reward = np.mean(eval_rewards)
             eval_mean_rewards.append(eval_mean_reward)
+            eval_mean_len = np.mean(eval_lens)
+            eval_mean_lens.append(eval_mean_len)
             print("Mean evaluation reward: {}".format(eval_mean_reward))
+            print("Mean evaluation length: {}".format(eval_mean_len))
             writer.add_scalar(
                     "Mean evaluation reward",
                     eval_mean_reward,
+                    total_samples
+                    )
+            writer.add_scalar(
+                    "Mean evaluation length",
+                    eval_mean_len,
                     total_samples
                     )
             if eval_mean_reward > best_eval_mean_reward:
