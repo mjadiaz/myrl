@@ -8,25 +8,16 @@ agent:
   gamma: 0.99 
   max_size: 1_000_000
   batch_size: 64
-  save_path: 'tests/apex_ddpg_3'
-  double_dqn: True
+  save_path: 'tests/apex_ddpg_6'
   multi_step_n: 3
   q_update_freq: 100
   send_experience_freq: 100
   learning_starts: 5000
-  num_workers: 37
+  num_workers: 4
   noise_type: "gauss"
-
   timesteps_per_iteration: 10000
   max_samples: 2_000_000
 
 env:
   name: 'LunarLanderContinuous-v2'
-memory:
-  warm_start: False
-  n_random_actions: 0
-  prioritized: False
-  alpha: 0.7
-  beta: 0.5
-  random_state: 
 

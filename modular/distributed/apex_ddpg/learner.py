@@ -34,7 +34,7 @@ class Learner:
         self.total_collected_samples = 0
         self.samples_since_last_update = 0
         
-        self.send_weights_to_parameter_server()
+        self.send_weights()
         
         self.stopped = False
         
@@ -73,7 +73,12 @@ class Learner:
 
 
     def send_weights_to_parameter_server(self):
-        self.parameter_server.update_weights.remote(self.actor.get_weights())
+        self.parameter_server.update_weights.remote(
+                self.actor.get_weights()
+                )
+        self.parameter_server.update_critic_weights.remote(
+                self.critic.get_weights()
+                )
 
     def start_learning(self):
         print("Learning starting ... ")
@@ -150,45 +155,22 @@ class Learner:
             self.update_target_net()
 
 
-
-
-            # Double DQN
-            #self.target_dqn.eval()
-            #self.dqn.eval()
-            #q_values = self.dqn(obs)
-            #max_q_values = torch.gather(
-            #        q_values, 1, actions.unsqueeze(-1).to(torch.int64)) 
-            #max_q_values = max_q_values.flatten()
-            #astar = torch.argmax(q_values, dim=1)
-            #qs = self.target_dqn(last_obs).gather(
-            #        dim=1, index=astar.unsqueeze(dim=1)).squeeze()
-            #
-            #y = rewards + gammas * qs.detach() *\
-            #        (torch.ones(self.batch_size).to(self.device) - dones)
-
-            #self.dqn.train()
-            #self.dqn.optimizer.zero_grad()
-    
-            #dqn_loss = F.mse_loss(y, max_q_values)
-            #dqn_loss.backward()
-            #self.dqn.optimizer.step()
-
-
             self.send_weights() 
             
-            #if self.samples_since_last_update > 500:
-            #     self.update_target_net()
-            #     self.samples_since_last_update = 0
-            # return True
         else:
             print("No samples received from the buffer.")
             time.sleep(5)
             return False
 
     def send_weights(self):
-        id = self.parameter_server.update_weights.remote(
+        aid = self.parameter_server.update_weights.remote(
                 self.actor.get_weights()
                 )
-        ray.get(id)
+        cid = self.parameter_server.update_critic_weights.remote(
+                self.critic.get_weights()
+                ) 
+        ray.get(aid)
+        ray.get(cid)
+    
     def stop(self):
         self.stopped = True
