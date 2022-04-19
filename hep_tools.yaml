@@ -15,7 +15,7 @@ model:
     high_lim:  [  1000.,   1000.,        10.,       900.]
   goal:
     name:      ['Mh(1)', 'Mh2(2)', 'obsratio', 'csq(tot)']
-    value:     [    93.,     125.,         0.,       100.]
+    value:     [    93.,     125.,         0.,       0.]
   env:
     max_steps: 50
     max_steps_no_spectrum: 10

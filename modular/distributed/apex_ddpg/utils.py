@@ -13,8 +13,13 @@ class Writer:
 
 
 class HyperParams:
-    def __init__(self, agent_file: str, save_path=None):
+    def __init__(self,
+            agent_file: str,
+            save_path=None,
+            env_config: DictConfig = None
+            ):
         self._hp = OmegaConf.load(agent_file)
+        self.env_config = env_config
         if not save_path == None:
             self._hp.agent.save_path = save_path
         self.alpha = self._hp.agent.alpha
@@ -34,7 +39,10 @@ class HyperParams:
     def get_config(self):
         return self._hp
     def create_env(self):
-        env = gym.make(self._hp.env.name)
+        if not(self.env_config == None):
+            env = gym.make(self._hp.name, env_config=self.env_config)
+        else:
+            env = gym.make(self._hp.env.name)
         config = OmegaConf.create(
                 {'env': {
                     'state_dimension': env.observation_space.shape[0],
