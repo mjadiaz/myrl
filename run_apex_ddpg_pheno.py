@@ -21,6 +21,7 @@ from pheno_game.envs.pheno_env import PhenoEnvContinuous_v0
 def train(save_path):
     # Read hyper parameters
     env_config = OmegaConf.load("hep_tools.yaml")
+    #env_config = None
     hyper_parameters = HyperParams(
         "agent_configs/apex_ddpg.yaml",
         env_config=env_config,
@@ -99,7 +100,7 @@ def train(save_path):
             eval_rewards = eval_rewards_lens[:,0]
             eval_lens = eval_rewards_lens[:,1]
             print("Evaluation rewards: {}".format(eval_rewards))
-            print("Evaluation lens: {}".formta(eval_lens))
+            print("Evaluation lens: {}".format(eval_lens))
             eval_mean_reward = np.mean(eval_rewards)
             eval_mean_rewards.append(eval_mean_reward)
             eval_mean_len = np.mean(eval_lens)

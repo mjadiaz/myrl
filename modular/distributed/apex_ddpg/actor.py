@@ -48,7 +48,7 @@ class Actor:
         if self.noise_type == 'OU':
             self.noise = OUActionNoise(mu=np.zeros(self.action_dimension))
         else:
-            self.noise = GaussNoise(scale=1, size=self.action_dimension)
+            self.noise = GaussNoise(scale=0.1, size=self.action_dimension)
         
 
 

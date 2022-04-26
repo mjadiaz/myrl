@@ -2,22 +2,24 @@ agent:
   max_exploration_eps: 0.5 
   final_exploration: 0.1 
   final_exploration_frame: 10_000
-  alpha: 0.0001
-  beta: 0.001
-  tau: 0.001 
+  alpha: 0.001 #0.00025
+  beta: 0.001 #0.0025
+  tau: 0.002 #0.001 
   gamma: 0.99 
   max_size: 1_000_000
   batch_size: 64
   save_path: 'tests/apex_ddpg_6'
-  multi_step_n: 3
+  multi_step_n: 2
   q_update_freq: 100
   send_experience_freq: 100
-  learning_starts: 500
+  learning_starts: 100
   num_workers: 37
-  noise_type: "gauss"
+  noise_type: "OU"
   timesteps_per_iteration: 1000
   max_samples: 5_000_000
 
 env:
+  #name: 'LunarLanderContinuous-v2'
   name: 'PhenoEnvContinuous-v0'
+
 
